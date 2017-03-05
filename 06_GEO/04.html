@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+path{
+	fill:transparent;
+	stroke:#000;
+}
+
+.town{
+	opcaity:0;
+}
+
+.北投區{
+	fill:#ff0000;
+}
+
+</style>
+<body>
+<script src="../lib/d3.min.js"></script>
+<script src="../lib/topojson.v1.min.js"></script>
+<script>
+
+var width = 500,
+	height = 500;
+
+var svg = d3.select("body").append("svg")
+	.attr("width", width)
+	.attr("height", height);
+
+d3.json("../data/taipei.topojson", function(error, data) {
+	if (error) return console.error(error);
+
+	var projection = d3.geoMercator()
+		.center([121.57745361328125,25.098035823821835])
+    .scale(80000)
+		.translate([width / 2, height / 2]);
+
+	var zipcodes = topojson.feature(data, data.objects.taipei);
+
+	var path = d3.geoPath().projection(projection);
+
+	/*svg.append("path")
+		.datum(zipcodes)
+		.attr("d", path);*/
+
+	svg.selectAll("path")
+		.data(topojson.feature(data, data.objects.taipei).features)
+		.enter().append("path")
+		.attr("class", function(d) { return "town " + d.properties.town; })
+		//.style("fill", function(d) { return "rgba("+Math.round(Math.random()*255.0)+",0,0,1)"; })
+		.attr("d", path);
+
+});
+
+</script>
+
+
+
+
+
+
+

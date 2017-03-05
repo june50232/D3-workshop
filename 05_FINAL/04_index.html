@@ -1,0 +1,46 @@
+<html>
+	<head>
+		<script type="text/javascript" src="../lib/d3.min.js"></script>
+		<style>
+			
+		</style>
+	</head>
+	<body>
+		<div id="container"><h1>Station Name</h1></div>
+		<a id="btn-next">Next</a>
+		<a id="btn-prev">Prev</a>
+		<script type="text/javascript">
+
+			var container = d3.select("#container");
+
+			var stations, current_station = 0;
+
+			d3.json('../data/stations.json', function(e, s){
+				stations = s;
+
+				showStation();
+			});
+
+			d3.select('#btn-next').on('click', function(){
+				current_station++;
+				if(current_station >= stations.length){
+					current_station = 0;
+				}
+				showStation();
+			});
+
+			d3.select('#btn-prev').on('click', function(){
+				current_station--;
+				if(current_station < 0){
+					current_station = stations.length-1;
+				}
+				showStation();
+			});
+
+			function showStation(){
+				container.select('h1').text("#"+current_station+": "+stations[current_station].longname);
+			}
+
+		</script>
+	</body>
+</html>

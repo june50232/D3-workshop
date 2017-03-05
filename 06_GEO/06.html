@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+	path{
+		fill:transparent;
+		stroke:rgba(100,100,100,1);
+	}
+
+	circle{
+		fill:red;
+		stroke:transparent;
+	}
+</style>
+<body>
+<script src="../lib/d3.min.js"></script>
+<script>
+
+var width = 500,
+	height = 800;
+
+var svg = d3.select("body").append("svg")
+	.attr("width", width*2)
+	.attr("height", height);
+
+d3.json("../data/taipei.geojson", function(error, taipei_data) {
+	if (error) return console.error(error);
+
+	d3.json("../data/elderly_day_care_centeres.json", function(error, centeres_data) {
+		if (error) return console.error(error);
+
+		centeres_data = centeres_data.filter(function(d,i){
+			if(d.LAT == undefined || d.LON == undefined){
+				return false;
+			}else{
+				return true;
+			}
+		});
+
+		var projection = d3.geoMercator()
+      .center([121.57745361328125,25.098035823821835])
+      .scale(80000)
+			.translate([width / 2, height / 2]);
+
+		var path = d3.geoPath().projection(projection);
+
+		centeres_data.forEach(function(d,i){
+			var p = projection([d.LON,d.LAT]);
+			d.x = p[0];
+			d.y = p[1];
+		});
+
+		svg.selectAll('path').data(taipei_data.features).enter().append('path')
+			.attr("d", function(d, i){ return path(d); });
+
+		svg.selectAll("circle").data(centeres_data).enter().append("circle")
+			.attr("r", 10)
+			.style("fill", "rgba(255,0,0,1)")
+			.attr("cx", function(d,i){
+				return d.x;
+			})
+			.attr("cy", function(d,i){
+				return d.y;
+			});
+	});
+
+});
+
+</script>
+
+
+
+
+
+
+

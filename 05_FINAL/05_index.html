@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  margin: 0;
+}
+
+path {
+  fill: none;
+  stroke: red;
+  stroke-linejoin: round;
+  stroke-width: 1.5px;
+}
+
+</style>
+<svg></svg>
+<script type="text/javascript" src="../lib/d3.min.js"></script>
+<script>
+
+var pi = Math.PI,
+    tau = 2 * pi;
+
+var width = Math.max(960, window.innerWidth),
+    height = Math.max(500, window.innerHeight);
+
+// Initialize the projection to fit the world in a 1×1 square centered at the origin.
+var projection = d3.geoMercator()
+    .scale(1 / tau)
+    .translate([0, 0]);
+
+var path = d3.geoPath()
+    .projection(projection);
+
+var zoom = d3.zoom()
+    .scaleExtent([1 << 11, 1 << 20])
+    .on("zoom", zoomed);
+
+var svg = d3.select("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var vector, center;
+
+d3.json("../../map_examples/data/bayarea_zipcodes.json", function(error, sf) {
+  if (error) throw error;
+
+  vector = svg.append('g').selectAll('path')
+      .data(sf.features).enter().append('path');
+
+  // Compute the projected initial center.
+  center = projection([-122.5776844,37.7576171]);
+
+  // Apply a zoom transform equivalent to projection.{scale,translate,center}.
+  svg
+      .call(zoom)
+      .call(zoom.transform, d3.zoomIdentity
+          .translate(width / 2, height / 2)
+          .scale(1 << 12)
+          .translate(-center[0], -center[1]));
+});
+
+function zoomed() {
+  var transform = d3.event.transform;
+
+  projection
+      .scale(transform.k / tau)
+      .translate([transform.x, transform.y]);
+
+  vector
+      .attr("d", path);
+
+}
+
+function reset(){
+	svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity
+          .translate(width / 2, height / 2)
+          .scale(1 << 12)
+          .translate(-center[0], -center[1]));
+}
+
+</script>

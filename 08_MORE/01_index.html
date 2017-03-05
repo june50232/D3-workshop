@@ -1,0 +1,91 @@
+<html>
+	<head>
+		<script type="text/javascript" src="../lib/d3.min.js"></script>
+		<style>
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+			var width = 500,
+				height = 960;
+
+			var projection = d3.geoMercator()
+				.center([10.3244325,51.2607755])
+				.translate([width/2, height/2])
+				.scale(3000);
+
+			var canvas = d3.select("body").append("canvas")
+				.attr("width", width)
+				.attr("height", height);
+
+			var context = canvas.node().getContext("2d");
+
+			//Rect & Circle
+
+			var data = [1,2,13,20,23];
+
+			var margin = 50;
+
+			var scaleX = d3.scaleLinear()
+				.range([margin, width-margin])
+				.domain(d3.extent(data));
+
+			var scaleY = d3.scaleLinear()
+				.range([margin, height-margin])
+				.domain(d3.extent(data));
+
+			data.forEach(function(d, i) {
+
+				context.beginPath();
+				context.rect(scaleX(d), 150, 10, 10);
+				context.fillStyle="red";
+				context.fill();
+				context.closePath();
+
+				context.beginPath();
+				context.arc(scaleX(d), scaleY(d), 10, 0, Math.PI*2, false);
+				context.fillStyle="green";
+				context.fill();
+				context.closePath();
+
+			});
+
+			//TEXT
+
+			context.font="20px Helvetica, Arial";
+			context.fillStyle="black";
+			context.fillText("Hello World!",10,50);
+
+			//GEO
+
+			var path = d3.geoPath()
+				.projection(projection)
+				.context(context);
+
+			d3.json("../data/taipei.geojson", function(error, de) {
+				if (error) throw error;
+
+				context.beginPath();
+				path(de);
+				context.strokeStyle = "blue";
+				context.stroke();
+			});
+
+			//Another good tutorial: http://www.visualcinnamon.com/2015/11/learnings-from-a-d3-js-addict-on-starting-with-canvas.html
+
+		</script>
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

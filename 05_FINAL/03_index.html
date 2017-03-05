@@ -1,0 +1,49 @@
+<html>
+	<head>
+		<script type="text/javascript" src="../lib/d3.min.js"></script>
+		<style>
+			
+		</style>
+	</head>
+	<body>
+		<div id="container"><h1>Station Name</h1></div>
+		<a id="btn-next">Next</a>
+		<a id="btn-prev">Prev</a>
+		<script type="text/javascript">
+
+			var data = [0,1,2,3,4,5];
+
+			var svg = d3.select('body')
+				.append('svg')
+					.attr('width', 500)
+					.attr('height', 500);
+
+			var circles = svg.selectAll('circle').data(data).enter().append('circle')
+				.attr('r', 10)
+				.attr('class', 'kreise')
+				.attr('cx', function(d,i){
+					return i*10;
+				})
+				.attr('cy', function(d,i){
+					return i*10;
+				})
+				.style('fill', 'rgba(0,0,0,1)')
+				.on('click', function(){
+					d3.selectAll('.kreise').style('fill', 'rgba(0,0,0,1)');
+					d3.select(this).style('fill', 'rgba(255,0,0,1)');
+				});
+
+		</script>
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

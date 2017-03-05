@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<title>D3 + Leaflet</title>
+<script src="../lib/d3.v3.min.js"></script>
+<style>
+
+
+
+  </style>
+</head>
+<body>
+  <script>
+
+  	var array_1 = [0,1,"test"];
+
+  	var array_2 = {
+  		"name":"Sebastian",
+  		"city":"Berlin"
+  	};
+
+  	var countries = {};
+
+  	d3.csv('all.csv', function(error, all){
+  		d3.csv('water_source.csv', function(error, water){
+
+  			all.forEach(function(d,i){
+  				countries[d.name] = i;
+  			});
+
+  			water.forEach(function(d,i){
+  				if(countries[d.Country] != undefined){
+  					console.log(d.Country, all[countries[d.Country]].region);
+  				}
+  			});
+
+  		});
+  	});
+
+
+  </script>
+ </body>
+</html>
+
+
+
+
+

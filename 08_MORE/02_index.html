@@ -1,0 +1,100 @@
+<html>
+	<head>
+		<script type="text/javascript" src="../lib/d3.min.js"></script>
+		<style>
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+			var CirclePlugin = function(){
+
+				//global variables
+				var selection,
+					circles = [],
+					data = [],
+
+					width = 500,
+					height = 500,
+					margin = 50,
+
+					x = d3.scaleLinear()
+						.domain([0,0])
+						.range([margin,width-margin]),
+
+					y = d3.scaleLinear()
+						.domain([0,0])
+						.range([margin,height-margin]);
+
+				//constructor
+				function circlePlugin(sel){
+					selection = sel;
+
+					circlePlugin.update();
+				}
+
+				circlePlugin.data = function(d){
+					data = d;
+					x.domain(d3.extent(data));
+					y.domain([0,data.length]);
+				};
+
+				circlePlugin.update = function(d){
+					circles = [];
+
+					selection.each(function() {
+						var sel = d3.select(this);
+
+						circles.push(sel.selectAll('circles').data(data).enter().append('circle')
+							.attr('cx', function(d,i){
+								return x(d);
+							})
+							.attr('cy', function(d,i){
+								return y(i);
+							})
+							.attr('r', 5));
+					});
+				};
+
+				circlePlugin.changeColor = function(color){
+					circles.forEach(function(d,i){
+						d.style('fill', color);
+					});
+				};
+
+				return circlePlugin;
+			};
+
+			var plugin = CirclePlugin();
+
+				plugin.data([1,2,3,4,5,6]);
+
+			var svg = d3.select('body').append('svg')
+				.attr('width',500)
+				.attr('height',500);
+
+			svg.call(plugin);
+
+			plugin.changeColor('red');
+
+		</script>
+	</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+</html>

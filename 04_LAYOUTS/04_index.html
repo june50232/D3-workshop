@@ -1,0 +1,146 @@
+<html>
+	<head>
+		<script type="text/javascript" src="../lib/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="../lib/d3.min.js"></script>
+		<style>
+			.graph path{
+				stroke:#000;			
+				fill:rgba(0,0,0,0.3);
+			}
+
+			#container{
+				width:100%;
+				height:500px;
+			}
+
+			svg{
+				height:100%;
+				width:100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+<!--
+KOMMENTARE
+-->
+		<script type="text/javascript">
+
+			function debouncer( func , timeout ) {
+				var timeoutID , timeout = timeout || 200;
+				return function () {
+					var scope = this , args = arguments;
+					clearTimeout( timeoutID );
+					timeoutID = setTimeout( function () {
+						func.apply( scope , Array.prototype.slice.call( args ) );
+					} , timeout );
+				};
+			}
+
+			d3.select(window).on('resize', debouncer(function(){
+				//resize
+				console.log("resize");
+				draw();
+			}));
+
+			/*var svg = sel.append('svg')
+				.attr('viewBox', '0 0 '+width+' '+height)
+				.attr('preserveAspectRatio', 'xMidYMid meet');*/
+
+			var json, filterJson, x, y;
+
+			var svg = d3.select("#container")
+					.append("svg");
+					//.attr("width", 1100)
+					//.attr("height", 500);
+
+			d3.json("../data/BUXTEHUDE.json", function(e, j){
+				json = j;
+
+				json.forEach(function(d, i){
+					d.timestamp = new Date(Date.parse(d.timestamp));
+				});
+
+				filterJson = json.filter(function(d,i){
+					if(i%200 === 2){
+						return true;
+					}else{
+						return false;
+					}
+				});
+
+				y = d3.scaleLinear()
+					/*.domain(d3.extent(filterdata, function(d,i){
+						return d.value;
+					}))*/
+					.domain([0, (100+d3.max(filterJson, function(d,i){
+						return d.value;
+					}))])
+					.range([300, 0]);
+
+				x = d3.scaleTime()
+					.domain(d3.extent(filterJson, function(d,i){
+						return d.timestamp;
+					}))
+					.range([0,1000]);
+
+				draw();
+			});
+
+			function draw(){
+
+				svg.selectAll('*').remove();
+
+				var bb = d3.select("#container").node().getBoundingClientRect(),
+					width = bb.width,
+					height = bb.height;
+
+				x.range([0,(width-100)]);
+
+				var line = d3.line()
+					.x(function(d,i){
+						return x(d.timestamp);
+					})
+					.y(function(d,i){
+						return y(d.value);
+					});				
+
+				var xAxis = d3.axisBottom(x)
+							.ticks(Math.round(width/100)),
+					yAxis = d3.axisLeft(y);
+
+				var graph = svg.append("g")
+					.attr("class", "graph")
+					.attr("transform", "translate(50, 0)");
+
+				var circles = graph.selectAll('circle').data(filterJson).enter().append('circle')
+						.attr("cx", function(d,i){ return x(d.timestamp); })
+						.attr("cy", function(d,i){ return y(d.value); })
+						.attr("r", 2);
+
+				var path = graph.append('path')
+					.datum(filterJson)
+					.attr("d", function(d, i){ return line(d)+"L"+(width-100)+" 300L0 300Z"; });
+
+				svg.append("g")
+					.attr("transform", "translate(30, 0)")
+					.call(yAxis);
+
+				svg.append("g")
+					.attr("transform", "translate(50, 320)")
+					.call(xAxis);
+
+			}
+
+		</script>
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
